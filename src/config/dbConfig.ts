@@ -14,6 +14,9 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASS || "", // Use an empty string for password if not set
   database: process.env.DB_NAME || "test_db",
   entities: [User],
-  synchronize: true,
-  logging: false,
+  synchronize: false,
+  logging: true,
+  migrations: ["src/migrations/*.ts"],
+
 });
+

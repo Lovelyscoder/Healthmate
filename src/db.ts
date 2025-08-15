@@ -1,7 +1,5 @@
 import "reflect-metadata";
-import { DataSource } from "typeorm";
 import { AppDataSource } from "./config/dbConfig";
-import { User } from "./models/User";
 
 export const connectDB = async () =>{
   try{

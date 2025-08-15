@@ -8,17 +8,14 @@ import { appConfig } from "./config/appConfig";
 const app = express();
 app.use(express.json());
 
-(async () => {
-  try {
-    await AppDataSource.initialize();
-    console.log("Database Connected");
+// Connect Database
+ connectDB();
 
-    app.use("/users", userroute);
-    
-    app.listen(appConfig.port, () => {
+//Routes
+ app.use("/users", userroute);
+
+//Start Server    
+ app.listen(appConfig.port, () => {
       console.log("Server running on prot", appConfig.port);
     });
-  } catch (err) {
-    console.error("Failed", err);
-  }
-})();
+ 
