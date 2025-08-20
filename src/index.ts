@@ -10,6 +10,7 @@ app.use(express.json());
 
 // Connect Database
  connectDB();
+ console.log("Database connected");
 
 //Routes
  app.use("/users", userroute);
