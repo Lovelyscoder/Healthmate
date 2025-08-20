@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/dbConfig";
 import { User } from "../models/User";
-import { CreateUserDto, UpdateUserDto } from "../dto/user_dto";
-import { validate } from "Class-validator";
-import { plainToInstance } from "class-transformer";
+
+import { UserService } from "../services/user.servics";
 
 const userRepository = AppDataSource.getRepository(User);
+const userService =new UserService();
 //Get all users
 
 export const getUsers = async(req: Request, res:Response) =>{
   try {
-    const users = await userRepository.find();
+    const users = await userService.getUsers();
     return res.json(users);
   }catch(error){
     return res.status(500).json({message: "Error fetching users",error});
@@ -19,7 +19,8 @@ export const getUsers = async(req: Request, res:Response) =>{
 //Get user by Id
 export const getUserById = async(req: Request, res:Response) =>{
   try {
-    const user =await userRepository.findOneBy({id:parseInt(req.params.id)});
+    //const user =await userRepository.findOneBy({id:parseInt(req.params.id)});
+    const user =await userService.getUserById(parseInt(req.params.id))
     if (!user){
       return res.status(404).json({ message: "user not found"});
     }
@@ -33,20 +34,8 @@ export const getUserById = async(req: Request, res:Response) =>{
 // Create user
 export const createUser = async (req: Request, res: Response) => {
   try {
-    //Request body ko DTO me convert karna
-    const userDto = plainToInstance(CreateUserDto, req.body);
-
-    //Validate chalana
-    const errors = await validate(userDto);
-    if (errors.length > 0) {
-      return res.status(400).json({ message: "Validation failed", errors });
-    }
-
-    //User create & save
-    const user = userRepository.create(userDto);
-    const savedUser = await userRepository.save(user);
-
-    res.status(201).json(savedUser);
+    const user=await userService.createUser(req.body);
+    res.status(201).json(user);
   } catch (error) {
     console.error("Error creating user:", error);
   }
@@ -56,19 +45,11 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const upDateUser = async (req: Request,res:Response) =>{
   try{
-    const userDto = plainToInstance(UpdateUserDto, req.body);
-    const error = await validate(userDto);
-    if (error.length > 0){
-      const errorMessage = error.map(err => Object.values(err.constraints || {})).flat();
-      return res.status(400).json({errors: errorMessage});
-    }
-    const user = await userRepository.findOneBy({id: parseInt(req.params.id)});
-    if (!user){
+     const updatedUser =await userService.updateUser(parseInt(req.params.id),req.body)
+      if (!updatedUser){
       return res.status(404).json({message:"User not found"});
     }
-    Object.assign(user ,userDto);
-    const UpdatedUser =await userRepository.save(user);
-    return res.json(UpdatedUser);
+    return res.json(updatedUser);
   }catch (error){
     return res.status(500).json({message:"Error updating user", error});
   }
@@ -78,7 +59,7 @@ export const upDateUser = async (req: Request,res:Response) =>{
 // Delete user
 export const deleteUser = async (req: Request, res:Response) =>{
   try{
-    const result = await userRepository.delete(req.params.id);
+    const result = await userService.deleteUser(parseInt(req.params.id));
     if(result.affected ===0){
         return res.status(404).json({message:"User not found"});
 

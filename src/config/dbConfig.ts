@@ -1,6 +1,11 @@
 //import { DataSource } from "typeorm";
 import "reflect-metadata";
 import { User } from "../models/User";
+import { Doctor } from "../models/Doctor";
+import { Reminder } from "../models/Reminder";
+import { History } from "../models/History";
+import { MedicalInfo } from "../models/MedicalInfo";
+import { Schedule } from "../models/Schedule";
 import dotenv from "dotenv";
 import { DataSource } from "typeorm";
 
@@ -13,10 +18,8 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER || "root",
   password: process.env.DB_PASS || "", // Use an empty string for password if not set
   database: process.env.DB_NAME || "test_db",
-  entities: [User],
+  entities: [User,Doctor,Reminder,MedicalInfo,History,Schedule],
   synchronize: false,
   logging: true,
   migrations: ["src/migrations/*.ts"],
-
 });
-
