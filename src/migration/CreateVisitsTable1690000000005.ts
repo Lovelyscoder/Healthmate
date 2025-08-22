@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner, Table, TableForeignKey } from "typeorm";
 
-export class CreateHistoryTable1690000000003 implements MigrationInterface {
+export class CreateVisitsTable1690000000005 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: "history",
+        name: "visits",
         columns: [
           {
             name: "id",
@@ -13,14 +13,11 @@ export class CreateHistoryTable1690000000003 implements MigrationInterface {
             isGenerated: true,
             generationStrategy: "increment",
           },
-          {
-            name: "user_id",
-            type: "int",
-            isNullable: false,
-          },
-          // Add other history-specific columns here, e.g.:
-          { name: "action", type: "varchar", length: "255", isNullable: true },
-          { name: "details", type: "text", isNullable: true },
+          { name: "visit_date", type: "timestamp", isNullable: false },
+          { name: "reason", type: "text", isNullable: true },
+          { name: "notes", type: "text", isNullable: true },
+          { name: "doctor_id", type: "int", isNullable: true }, // allows SET NULL
+          { name: "patient_id", type: "int", isNullable: false },
           {
             name: "createdAt",
             type: "timestamp",
@@ -37,18 +34,30 @@ export class CreateHistoryTable1690000000003 implements MigrationInterface {
       true
     );
 
+    // Foreign key: doctor_id → doctors(id)
     await queryRunner.createForeignKey(
-      "history",
+      "visits",
       new TableForeignKey({
-        columnNames: ["user_id"],
+        columnNames: ["doctor_id"],
+        referencedTableName: "doctors",
         referencedColumnNames: ["id"],
-        referencedTableName: "users",
+        onDelete: "SET NULL",
+      })
+    );
+
+    // Foreign key: patient_id → patients(id)
+    await queryRunner.createForeignKey(
+      "visits",
+      new TableForeignKey({
+        columnNames: ["patient_id"],
+        referencedTableName: "patients",
+        referencedColumnNames: ["id"],
         onDelete: "CASCADE",
       })
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable("history");
+    await queryRunner.dropTable("visits");
   }
 }

@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner, Table, TableForeignKey } from "typeorm";
 
-export class CreateHistoryTable1690000000003 implements MigrationInterface {
+export class CreatePatientsDiseasesTable1690000000003 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: "history",
+        name: "patients_diseases",
         columns: [
           {
             name: "id",
@@ -13,24 +13,12 @@ export class CreateHistoryTable1690000000003 implements MigrationInterface {
             isGenerated: true,
             generationStrategy: "increment",
           },
-          {
-            name: "user_id",
-            type: "int",
-            isNullable: false,
-          },
-          // Add other history-specific columns here, e.g.:
-          { name: "action", type: "varchar", length: "255", isNullable: true },
-          { name: "details", type: "text", isNullable: true },
+          { name: "patient_id", type: "int", isNullable: false },
+          { name: "disease_id", type: "int", isNullable: false },
           {
             name: "createdAt",
             type: "timestamp",
             default: "CURRENT_TIMESTAMP",
-          },
-          {
-            name: "updatedAt",
-            type: "timestamp",
-            default: "CURRENT_TIMESTAMP",
-            onUpdate: "CURRENT_TIMESTAMP",
           },
         ],
       }),
@@ -38,17 +26,27 @@ export class CreateHistoryTable1690000000003 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      "history",
+      "patients_diseases",
       new TableForeignKey({
-        columnNames: ["user_id"],
+        columnNames: ["patient_id"],
+        referencedTableName: "patients",
         referencedColumnNames: ["id"],
-        referencedTableName: "users",
+        onDelete: "CASCADE",
+      })
+    );
+
+    await queryRunner.createForeignKey(
+      "patients_diseases",
+      new TableForeignKey({
+        columnNames: ["disease_id"],
+        referencedTableName: "diseases",
+        referencedColumnNames: ["id"],
         onDelete: "CASCADE",
       })
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable("history");
+    await queryRunner.dropTable("patients_diseases");
   }
 }

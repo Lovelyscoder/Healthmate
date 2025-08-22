@@ -14,18 +14,44 @@ export class CreateReminderTable1690000000001 implements MigrationInterface {
             generationStrategy: "increment",
           },
           {
-            name: "userId",
+            name: "user_id",
             type: "int",
+            isNullable: false,
           },
-          // Add other reminder-specific columns here
+          { name: "message", type: "text", isNullable: true },
+          { name: "reminder_time", type: "timestamp", isNullable: false },
+          {
+            name: "status",
+            type: "enum",
+            enum: ["pending", "completed", "missed"],
+            default: "'pending'",
+          },
+          {
+            name: "type",
+            type: "enum",
+            enum: ["medicines", "activity"],
+            isNullable: false,
+          },
+          {
+            name: "createdAt",
+            type: "timestamp",
+            default: "CURRENT_TIMESTAMP",
+          },
+          {
+            name: "updatedAt",
+            type: "timestamp",
+            default: "CURRENT_TIMESTAMP",
+            onUpdate: "CURRENT_TIMESTAMP",
+          },
         ],
-      })
+      }),
+      true
     );
 
     await queryRunner.createForeignKey(
       "reminders",
       new TableForeignKey({
-        columnNames: ["userId"],
+        columnNames: ["user_id"],
         referencedColumnNames: ["id"],
         referencedTableName: "users",
         onDelete: "CASCADE",

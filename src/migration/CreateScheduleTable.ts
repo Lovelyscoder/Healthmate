@@ -14,18 +14,40 @@ export class CreateScheduleTable1690000000004 implements MigrationInterface {
             generationStrategy: "increment",
           },
           {
-            name: "userId",
+            name: "user_id",
             type: "int",
+            isNullable: false,
           },
-          // Add other schedule-specific columns here
+          { name: "title", type: "varchar", length: "255", isNullable: false },
+          { name: "description", type: "text", isNullable: true },
+          { name: "start_time", type: "timestamp", isNullable: false },
+          { name: "end_time", type: "timestamp", isNullable: false },
+          {
+            name: "status",
+            type: "enum",
+            enum: ["pending", "completed", "cancelled"],
+            default: "'pending'",
+          },
+          {
+            name: "createdAt",
+            type: "timestamp",
+            default: "CURRENT_TIMESTAMP",
+          },
+          {
+            name: "updatedAt",
+            type: "timestamp",
+            default: "CURRENT_TIMESTAMP",
+            onUpdate: "CURRENT_TIMESTAMP",
+          },
         ],
-      })
+      }),
+      true
     );
 
     await queryRunner.createForeignKey(
       "schedules",
       new TableForeignKey({
-        columnNames: ["userId"],
+        columnNames: ["user_id"],
         referencedColumnNames: ["id"],
         referencedTableName: "users",
         onDelete: "CASCADE",

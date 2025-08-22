@@ -9,6 +9,6 @@ export class History{
   action!:String;
   @Column({type:"text",nullable:true})
   details!:string;
-  @ManyToOne(()=>User,(user)=>user.history,{onDelete:"CASCADE"})
-  user!:User;
+  @ManyToOne(() => User, (user) => user.histories, { onDelete: "CASCADE" })
+   user!: User;
 }
